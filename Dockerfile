@@ -30,5 +30,6 @@ COPY --from=frontend /app/notes-client/build ./server/frontend/build
 WORKDIR /app/server
 
 EXPOSE 5000
+EXPOSE 3000
 
 CMD ["node", "index.js"]
