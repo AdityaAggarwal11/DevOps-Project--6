@@ -47,15 +47,20 @@ app.use(express.static(frontendPath));
 //   res.sendFile(path.join(frontendPath, 'index.html'));
 // });
 
-app._router.stack.forEach((middleware) => {
-  if (middleware.route) { // routes registered directly on the app
-    console.log('Route:', middleware.route.path);
-  } else if (middleware.name === 'router') { // router middleware 
-    middleware.handle.stack.forEach((handler) => {
-      console.log('Router path:', handler.route?.path);
-    });
-  }
-});
+if (app._router && app._router.stack) {
+  app._router.stack.forEach((middleware) => {
+    if (middleware.route) {
+      console.log('Route:', middleware.route.path);
+    } else if (middleware.name === 'router') {
+      middleware.handle.stack.forEach((handler) => {
+        console.log('Router path:', handler.route?.path);
+      });
+    }
+  });
+} else {
+  console.log('⚠️  No routes registered yet.');
+}
+
 
 // Start server
 const PORT = process.env.PORT || 5000;
