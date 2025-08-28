@@ -43,8 +43,18 @@ const frontendPath = path.join(__dirname, 'frontend', 'build');
 app.use(express.static(frontendPath));
 
 // Fallback for SPA routing (React)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(frontendPath, 'index.html'));
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(frontendPath, 'index.html'));
+// });
+
+app._router.stack.forEach((middleware) => {
+  if (middleware.route) { // routes registered directly on the app
+    console.log('Route:', middleware.route.path);
+  } else if (middleware.name === 'router') { // router middleware 
+    middleware.handle.stack.forEach((handler) => {
+      console.log('Router path:', handler.route?.path);
+    });
+  }
 });
 
 // Start server

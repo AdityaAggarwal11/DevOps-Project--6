@@ -1,5 +1,5 @@
 # ---------- Build React Frontend ----------
-FROM node:22 AS frontend
+FROM node:18 AS frontend
 
 WORKDIR /app/notes-client
 
@@ -13,7 +13,7 @@ RUN npm run build
 
 
 # ---------- Setup Backend ----------
-FROM node:22 AS backend
+FROM node:18 AS backend
 
 WORKDIR /app
 
