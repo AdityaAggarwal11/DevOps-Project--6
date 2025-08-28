@@ -1,18 +1,21 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, {
+// MongoDB connection
+const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/notesapp';
+
+mongoose.connect(mongoUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true
-}).then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+}).then(() => console.log('✅ MongoDB connected'))
+  .catch(err => console.error('❌ MongoDB connection error:', err));
 
 // Notes Schema
 const noteSchema = new mongoose.Schema({
@@ -23,7 +26,7 @@ const noteSchema = new mongoose.Schema({
 
 const Note = mongoose.model('Note', noteSchema);
 
-// Routes
+// Notes API Routes
 app.get('/notes', async (req, res) => {
   const notes = await Note.find();
   res.json(notes);
@@ -35,11 +38,17 @@ app.post('/notes', async (req, res) => {
   res.json(newNote);
 });
 
-app.get('/', (req, res) => {
-  res.send('Welcome to the Notes API! Use GET/POST /notes to interact.');
+// Serve static files from React frontend build
+const frontendPath = path.join(__dirname, 'frontend', 'build');
+app.use(express.static(frontendPath));
+
+// Fallback for SPA routing (React)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
 // Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Notes API running on port ${PORT}`));
-
+app.listen(PORT, () => {
+  console.log(`🚀 Notes API + Frontend running on http://localhost:${PORT}`);
+});
